@@ -18,6 +18,9 @@ plugins {
 
 dependencies {
     implementation(libs.edc.spi.core)
+    implementation(libs.edc.spi.contract)
+    implementation(libs.edc.spi.asset)
+    implementation(libs.edc.spi.control.plane.spi)
 }
 
 // If the EDC Build Plugin is used, every module gets visited during Publishing by default.

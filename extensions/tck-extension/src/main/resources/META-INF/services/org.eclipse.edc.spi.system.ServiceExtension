@@ -11,4 +11,6 @@
 #       Bayerische Motoren Werke Aktiengesellschaft (BMW AG) - initial API and implementation
 #
 #
-org.eclipse.edc.template.ExampleExtension
+org.eclipse.edc.tck.dsp.guard.TckGuardExtension
+org.eclipse.edc.tck.dsp.setup.TckSetupExtension
+org.eclipse.edc.tck.dsp.identity.TckIdentityExtension

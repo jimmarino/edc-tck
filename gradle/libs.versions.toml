@@ -9,6 +9,9 @@ postgres = "42.7.3"
 
 [libraries]
 # SPI modules
+edc-spi-contract = { module = "org.eclipse.edc:contract-spi", version.ref = "edc" }
+edc-spi-control-plane-spi = { module = "org.eclipse.edc:control-plane-spi", version.ref = "edc" }
+edc-spi-asset = { module = "org.eclipse.edc:asset-spi", version.ref = "edc" }
 edc-spi-core = { module = "org.eclipse.edc:core-spi", version.ref = "edc" }
 edc-spi-identity-trust = { module = "org.eclipse.edc:identity-trust-spi", version.ref = "edc" }
 edc-spi-jwt = { module = "org.eclipse.edc:jwt-spi", version.ref = "edc" }
@@ -94,9 +97,15 @@ dpf = ["edc-dpf-selector-core", "edc-spi-dataplane-selector", "edc-dpf-selector-
 controlplane = ["edc-controlplane-core", "edc-auth-tokenbased", "edc-auth-configuration",
     "edc-api-management", "edc-api-management-config", "edc-api-management-edr", "edc-api-management-dataplaneselector",
     "edc-api-observability", "edc-dsp", "edc-spi-jwt", "edc-http", "edc-controlplane-callback-dispatcher-event",
-    "edc-controlplane-callback-dispatcher-http", "edc-identity-core-did", "edc-dcp-core", "edc-identity-trust-transform",
-    "edc-api-control-configuration", "edc-lib-transform", "edc-identity-vc-ldp", "edc-did-web", "edc-lib-jws2020", "edc-core-edrstore", "edc-edr-storereceiver"]
+    "edc-controlplane-callback-dispatcher-http",
+    "edc-api-control-configuration", "edc-lib-transform", "edc-core-edrstore", "edc-edr-storereceiver"]
 
+#controlplane = ["edc-controlplane-core", "edc-auth-tokenbased", "edc-auth-configuration",
+#    "edc-api-management", "edc-api-management-config", "edc-api-management-edr", "edc-api-management-dataplaneselector",
+#    "edc-api-observability", "edc-dsp", "edc-spi-jwt", "edc-http", "edc-controlplane-callback-dispatcher-event",
+#    "edc-controlplane-callback-dispatcher-http", "edc-identity-core-did", "edc-dcp-core", "edc-identity-trust-transform",
+#    "edc-api-control-configuration", "edc-lib-transform", "edc-identity-vc-ldp", "edc-did-web", "edc-lib-jws2020", "edc-core-edrstore", "edc-edr-storereceiver"]
+#
 dataplane = ["edc-dataplane-core", "edc-dataplane-api-control-config", "edc-dataplane-api-control-client", "edc-dataplane-selfregistration",
     "edc-dataplane-http", "edc-dataplane-http-oauth2", "edc-dataplane-api-control", "edc-dataplane-api-public", "edc-dataplane-api-signaling"]
 

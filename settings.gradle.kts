@@ -12,7 +12,7 @@
  *
  */
 
-rootProject.name = "template"
+rootProject.name = "edc-tck"
 
 // this is needed to have access to snapshot builds of plugins
 pluginManagement {
@@ -37,6 +37,6 @@ dependencyResolutionManagement {
 }
 
 // add dependencies
-include(":extensions:example-extension")
+include(":extensions:tck-extension")
 include(":runtimes:controlplane")
 include(":runtimes:dataplane")

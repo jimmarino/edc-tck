@@ -30,7 +30,7 @@ import static java.util.stream.Collectors.toSet;
  * Assembles data for the TCK scenarios.
  */
 public class DataAssembly {
-    private static final Set<String> ASSET_IDS = Set.of("ACN0101", "ACN0102", "ACN0103");
+    private static final Set<String> ASSET_IDS = Set.of("ACN0101", "ACN0102", "ACN0103", "ACN0104");
     private static final String POLICY_ID = "P123";
     private static final String CONTRACT_DEFINITION_ID = "CD123";
 
@@ -63,6 +63,9 @@ public class DataAssembly {
         recorder.record("ACN0103", ContractNegotiation::transitionOffering)
                 .record("ACN0103", ContractNegotiation::transitionAgreeing)
                 .record("ACN0103", ContractNegotiation::transitionFinalizing);
+
+        recorder.record("ACN0104", ContractNegotiation::transitionAgreeing)
+                .record("ACN0104", ContractNegotiation::transitionFinalizing);
 
         return recorder.repeat();
     }

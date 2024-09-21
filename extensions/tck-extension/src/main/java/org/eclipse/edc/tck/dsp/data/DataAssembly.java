@@ -60,6 +60,10 @@ public class DataAssembly {
         recorder.record("ACN0102", ContractNegotiation::transitionOffering)
                 .record("ACN0102", ContractNegotiation::transitionTerminating);
 
+        recorder.record("ACN0103", ContractNegotiation::transitionOffering)
+                .record("ACN0103", ContractNegotiation::transitionAgreeing)
+                .record("ACN0103", ContractNegotiation::transitionFinalizing);
+
         return recorder.repeat();
     }
 

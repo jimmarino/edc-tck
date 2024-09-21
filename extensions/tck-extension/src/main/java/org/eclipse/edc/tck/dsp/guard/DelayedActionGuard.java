@@ -14,7 +14,6 @@
 
 package org.eclipse.edc.tck.dsp.guard;
 
-import org.eclipse.edc.connector.controlplane.contract.spi.types.negotiation.ContractNegotiationStates;
 import org.eclipse.edc.spi.entity.PendingGuard;
 import org.eclipse.edc.spi.entity.StatefulEntity;
 import org.eclipse.edc.spi.persistence.StateEntityStore;
@@ -78,7 +77,7 @@ public class DelayedActionGuard<T extends StatefulEntity<T>> implements PendingG
 
     @Override
     public boolean test(T entity) {
-        if (entity.getState() == ContractNegotiationStates.REQUESTED.code() && filter.test(entity)) {
+        if (filter.test(entity)) {
             queue.put(new GuardDelay(entity));
             return true;
         }

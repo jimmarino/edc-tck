@@ -20,6 +20,12 @@ import org.eclipse.edc.runtime.metamodel.annotation.Inject;
 import org.eclipse.edc.runtime.metamodel.annotation.Provider;
 import org.eclipse.edc.spi.system.ServiceExtension;
 
+import java.util.Set;
+
+import static org.eclipse.edc.connector.controlplane.contract.spi.types.negotiation.ContractNegotiationStates.AGREEING;
+import static org.eclipse.edc.connector.controlplane.contract.spi.types.negotiation.ContractNegotiationStates.FINALIZING;
+import static org.eclipse.edc.connector.controlplane.contract.spi.types.negotiation.ContractNegotiationStates.OFFERING;
+import static org.eclipse.edc.connector.controlplane.contract.spi.types.negotiation.ContractNegotiationStates.TERMINATING;
 import static org.eclipse.edc.tck.dsp.data.DataAssembly.createNegotiationRecorder;
 
 /**
@@ -27,6 +33,12 @@ import static org.eclipse.edc.tck.dsp.data.DataAssembly.createNegotiationRecorde
  */
 public class TckGuardExtension implements ServiceExtension {
     private static final String NAME = "DSP TCK Guard";
+
+    // the states to not apply the guard to - i.e. to allow automatic transitions by the contract negotiation manager
+    private static final Set<Integer> AUTOMATIC_STATES = Set.of(OFFERING.code(),
+            AGREEING.code(),
+            TERMINATING.code(),
+            FINALIZING.code());
 
     private ContractNegotiationGuard negotiationGuard;
 
@@ -41,7 +53,7 @@ public class TckGuardExtension implements ServiceExtension {
     @Provider
     public ContractNegotiationPendingGuard negotiationGuard() {
         var recorder = createNegotiationRecorder();
-        negotiationGuard = new ContractNegotiationGuard(cn -> true,
+        negotiationGuard = new ContractNegotiationGuard(cn -> !AUTOMATIC_STATES.contains(cn.getState()),
                 cn -> recorder.playNext(cn.getContractOffers().get(0).getAssetId(), cn),
                 store);
         return negotiationGuard;

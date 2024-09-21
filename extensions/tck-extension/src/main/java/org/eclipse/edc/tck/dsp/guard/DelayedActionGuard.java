@@ -32,6 +32,9 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 /**
  * A guard that performs actions on a stateful entity.
+ * <p>
+ * Note this implementation is not safe to use in a clustered environment since transitions are not performed in the context of
+ * a command handler.
  */
 public class DelayedActionGuard<T extends StatefulEntity<T>> implements PendingGuard<T> {
     private Predicate<T> filter;

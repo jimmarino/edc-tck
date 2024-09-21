@@ -18,17 +18,26 @@ import org.eclipse.edc.connector.controlplane.contract.spi.negotiation.ContractN
 import org.eclipse.edc.connector.controlplane.contract.spi.types.negotiation.ContractNegotiation;
 import org.eclipse.edc.spi.persistence.StateEntityStore;
 
+import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
+
+import static org.eclipse.edc.connector.controlplane.contract.spi.types.negotiation.ContractNegotiationStates.AGREEING;
+import static org.eclipse.edc.connector.controlplane.contract.spi.types.negotiation.ContractNegotiationStates.FINALIZING;
+import static org.eclipse.edc.connector.controlplane.contract.spi.types.negotiation.ContractNegotiationStates.OFFERING;
+import static org.eclipse.edc.connector.controlplane.contract.spi.types.negotiation.ContractNegotiationStates.TERMINATING;
 
 /**
- * Marker class for contract negotiation guard.
+ * Contract negotiation guard for TCK testcases.
  */
 public class ContractNegotiationGuard extends DelayedActionGuard<ContractNegotiation> implements ContractNegotiationPendingGuard {
+    // the states to not apply the guard to - i.e. to allow automatic transitions by the contract negotiation manager
+    private static final Set<Integer> AUTOMATIC_STATES = Set.of(
+            OFFERING.code(),
+            AGREEING.code(),
+            TERMINATING.code(),
+            FINALIZING.code());
 
-    public ContractNegotiationGuard(Predicate<ContractNegotiation> filter,
-                                    Consumer<ContractNegotiation> action,
-                                    StateEntityStore<ContractNegotiation> store) {
-        super(filter, action, store);
+    public ContractNegotiationGuard(Consumer<ContractNegotiation> action, StateEntityStore<ContractNegotiation> store) {
+        super(cn -> !AUTOMATIC_STATES.contains(cn.getState()), action, store);
     }
 }

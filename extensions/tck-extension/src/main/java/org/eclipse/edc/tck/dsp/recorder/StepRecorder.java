@@ -24,9 +24,9 @@ import java.util.function.Consumer;
  * Records and plays a sequence of steps. Sequences may be repeated if {@link #repeat()} is enabled.
  */
 public class StepRecorder<T> {
-    private Map<String, List<Consumer<T>>> sequences = new HashMap<>();
     private boolean repeat;
     private int playIndex = 0;
+    private Map<String, List<Consumer<T>>> sequences = new HashMap<>();
 
     public synchronized StepRecorder<T> playNext(String key, T entity) {
         var sequence = sequences.get(key);

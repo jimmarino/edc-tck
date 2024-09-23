@@ -15,13 +15,16 @@
 package org.eclipse.edc.tck.dsp.data;
 
 import org.eclipse.edc.connector.controlplane.asset.spi.domain.Asset;
+import org.eclipse.edc.connector.controlplane.contract.spi.event.contractnegotiation.ContractNegotiationOffered;
 import org.eclipse.edc.connector.controlplane.contract.spi.types.negotiation.ContractNegotiation;
 import org.eclipse.edc.connector.controlplane.contract.spi.types.offer.ContractDefinition;
 import org.eclipse.edc.connector.controlplane.policy.spi.PolicyDefinition;
 import org.eclipse.edc.policy.model.Policy;
 import org.eclipse.edc.spi.types.domain.DataAddress;
+import org.eclipse.edc.tck.dsp.guard.Trigger;
 import org.eclipse.edc.tck.dsp.recorder.StepRecorder;
 
+import java.util.List;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
@@ -30,7 +33,7 @@ import static java.util.stream.Collectors.toSet;
  * Assembles data for the TCK scenarios.
  */
 public class DataAssembly {
-    private static final Set<String> ASSET_IDS = Set.of("ACN0101", "ACN0102", "ACN0103", "ACN0104", "ACN0201", "ACN0202", "ACN0203");
+    private static final Set<String> ASSET_IDS = Set.of("ACN0101", "ACN0102", "ACN0103", "ACN0104", "ACN0201", "ACN0202", "ACN0203", "ACN0204", "ACN0205");
     private static final String POLICY_ID = "P123";
     private static final String CONTRACT_DEFINITION_ID = "CD123";
 
@@ -73,9 +76,25 @@ public class DataAssembly {
 
         recorder.record("ACN0203", ContractNegotiation::transitionAgreeing);
 
+        recorder.record("ACN0204", ContractNegotiation::transitionOffering);
+
+        recorder.record("ACN0205", ContractNegotiation::transitionOffering);
+
         return recorder.repeat();
     }
 
+    public static List<Trigger<ContractNegotiation>> createNegotiationTriggers() {
+        return List.of(createOfferedTrigger("ACN0205"));
+    }
+
+    private static Trigger<ContractNegotiation> createOfferedTrigger(String assetId) {
+        return new Trigger<>(event -> {
+            if (event instanceof ContractNegotiationOffered offered) {
+                return assetId.equals(offered.getLastContractOffer().getAssetId());
+            }
+            return false;
+        }, ContractNegotiation::transitionTerminating);
+    }
 
     private DataAssembly() {
     }

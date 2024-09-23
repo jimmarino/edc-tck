@@ -14,7 +14,7 @@
 
 package org.eclipse.edc.tck.dsp.guard;
 
-import org.eclipse.edc.connector.controlplane.contract.spi.event.contractnegotiation.ContractNegotiationOffered;
+import org.eclipse.edc.connector.controlplane.contract.spi.event.contractnegotiation.ContractNegotiationEvent;
 import org.eclipse.edc.connector.controlplane.contract.spi.negotiation.ContractNegotiationPendingGuard;
 import org.eclipse.edc.connector.controlplane.contract.spi.negotiation.store.ContractNegotiationStore;
 import org.eclipse.edc.runtime.metamodel.annotation.Inject;
@@ -50,7 +50,7 @@ public class TckGuardExtension implements ServiceExtension {
 
         var registry = new ContractNegotiationTriggerSubscriber(store);
         createNegotiationTriggers().forEach(registry::register);
-        router.register(ContractNegotiationOffered.class, registry);
+        router.register(ContractNegotiationEvent.class, registry);
 
         negotiationGuard = new ContractNegotiationGuard(cn -> recorder.playNext(cn.getContractOffers().get(0).getAssetId(), cn), store);
         return negotiationGuard;

@@ -15,8 +15,11 @@
 package org.eclipse.edc.tck.dsp.data;
 
 import org.eclipse.edc.connector.controlplane.asset.spi.domain.Asset;
+import org.eclipse.edc.connector.controlplane.contract.spi.event.contractnegotiation.ContractNegotiationAccepted;
+import org.eclipse.edc.connector.controlplane.contract.spi.event.contractnegotiation.ContractNegotiationEvent;
 import org.eclipse.edc.connector.controlplane.contract.spi.event.contractnegotiation.ContractNegotiationOffered;
 import org.eclipse.edc.connector.controlplane.contract.spi.types.negotiation.ContractNegotiation;
+import org.eclipse.edc.connector.controlplane.contract.spi.types.negotiation.ContractNegotiationStates;
 import org.eclipse.edc.connector.controlplane.contract.spi.types.offer.ContractDefinition;
 import org.eclipse.edc.connector.controlplane.policy.spi.PolicyDefinition;
 import org.eclipse.edc.policy.model.Policy;
@@ -26,6 +29,7 @@ import org.eclipse.edc.tck.dsp.recorder.StepRecorder;
 
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import static java.util.stream.Collectors.toSet;
 
@@ -33,7 +37,7 @@ import static java.util.stream.Collectors.toSet;
  * Assembles data for the TCK scenarios.
  */
 public class DataAssembly {
-    private static final Set<String> ASSET_IDS = Set.of("ACN0101", "ACN0102", "ACN0103", "ACN0104", "ACN0201", "ACN0202", "ACN0203", "ACN0204", "ACN0205");
+    private static final Set<String> ASSET_IDS = Set.of("ACN0101", "ACN0102", "ACN0103", "ACN0104", "ACN0201", "ACN0202", "ACN0203", "ACN0204", "ACN0205", "ACN0206");
     private static final String POLICY_ID = "P123";
     private static final String CONTRACT_DEFINITION_ID = "CD123";
 
@@ -80,20 +84,32 @@ public class DataAssembly {
 
         recorder.record("ACN0205", ContractNegotiation::transitionOffering);
 
+        recorder.record("ACN0206", contractNegotiation -> {
+            // only transition if in requested
+            if (contractNegotiation.getState() == ContractNegotiationStates.REQUESTED.code()) {
+                contractNegotiation.transitionOffering();
+            }
+        });
+
         return recorder.repeat();
     }
 
     public static List<Trigger<ContractNegotiation>> createNegotiationTriggers() {
-        return List.of(createOfferedTrigger("ACN0205"));
+        return List.of(
+                createTrigger(ContractNegotiationOffered.class, "ACN0205", ContractNegotiation::transitionTerminating),
+                createTrigger(ContractNegotiationAccepted.class, "ACN0206", ContractNegotiation::transitionTerminating)
+        );
     }
 
-    private static Trigger<ContractNegotiation> createOfferedTrigger(String assetId) {
+    private static <E extends ContractNegotiationEvent> Trigger<ContractNegotiation> createTrigger(Class<E> type,
+                                                                                                   String assetId,
+                                                                                                   Consumer<ContractNegotiation> action) {
         return new Trigger<>(event -> {
-            if (event instanceof ContractNegotiationOffered offered) {
-                return assetId.equals(offered.getLastContractOffer().getAssetId());
+            if (event.getClass().equals(type)) {
+                return assetId.equals(((ContractNegotiationEvent) event).getLastContractOffer().getAssetId());
             }
             return false;
-        }, ContractNegotiation::transitionTerminating);
+        }, action);
     }
 
     private DataAssembly() {

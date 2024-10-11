@@ -25,6 +25,8 @@ import org.eclipse.edc.spi.result.Result;
  * No-op service
  */
 public class NoopIdentityService implements IdentityService {
+    private static final String TCK_PARTICIPANT_ID = "TCK_PARTICIPANT"; // the official TCK id
+
     @Override
     public Result<TokenRepresentation> obtainClientCredentials(TokenParameters tokenParameters) {
         return Result.success(TokenRepresentation.Builder.newInstance().token("1234").expiresIn(Long.MAX_VALUE).build());
@@ -32,6 +34,6 @@ public class NoopIdentityService implements IdentityService {
 
     @Override
     public Result<ClaimToken> verifyJwtToken(TokenRepresentation tokenRepresentation, VerificationContext verificationContext) {
-        return Result.success(ClaimToken.Builder.newInstance().claim("client_id", "Consumer").build());
+        return Result.success(ClaimToken.Builder.newInstance().claim("client_id", TCK_PARTICIPANT_ID).build());
     }
 }

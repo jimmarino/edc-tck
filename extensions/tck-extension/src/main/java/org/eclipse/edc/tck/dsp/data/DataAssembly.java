@@ -16,6 +16,7 @@ package org.eclipse.edc.tck.dsp.data;
 
 import org.eclipse.edc.connector.controlplane.asset.spi.domain.Asset;
 import org.eclipse.edc.connector.controlplane.contract.spi.event.contractnegotiation.ContractNegotiationAccepted;
+import org.eclipse.edc.connector.controlplane.contract.spi.event.contractnegotiation.ContractNegotiationAgreed;
 import org.eclipse.edc.connector.controlplane.contract.spi.event.contractnegotiation.ContractNegotiationEvent;
 import org.eclipse.edc.connector.controlplane.contract.spi.event.contractnegotiation.ContractNegotiationOffered;
 import org.eclipse.edc.connector.controlplane.contract.spi.types.negotiation.ContractNegotiation;
@@ -37,8 +38,10 @@ import static org.eclipse.edc.connector.controlplane.contract.spi.types.negotiat
  * Assembles data for the TCK scenarios.
  */
 public class DataAssembly {
-    private static final Set<String> ASSET_IDS = Set.of("ACN0101", "ACN0102", "ACN0103", "ACN0104", "ACN0201", "ACN0202",
-            "ACN0203", "ACN0204", "ACN0205", "ACN0206", "ACN0207");
+    private static final Set<String> ASSET_IDS = Set.of("ACN0101", "ACN0102", "ACN0103", "ACN0104",
+            "ACN0201", "ACN0202", "ACN0203", "ACN0204", "ACN0205", "ACN0206", "ACN0207",
+            "ACN0301", "ACN0302", "ACN0303", "ACN0304");
+
     private static final String POLICY_ID = "P123";
     private static final String CONTRACT_DEFINITION_ID = "CD123";
 
@@ -63,6 +66,20 @@ public class DataAssembly {
 
     public static StepRecorder<ContractNegotiation> createNegotiationRecorder() {
         var recorder = new StepRecorder<ContractNegotiation>();
+
+        record01NegotiationSequences(recorder);
+        record02NegotiationSequences(recorder);
+        record03NegotiationSequences(recorder);
+
+        recordC01NegotiationSequences(recorder);
+
+        return recorder.repeat();
+    }
+
+    private static void recordC01NegotiationSequences(StepRecorder<ContractNegotiation> recorder) {
+    }
+
+    private static void record01NegotiationSequences(StepRecorder<ContractNegotiation> recorder) {
         recorder.record("ACN0101", ContractNegotiation::transitionOffering);
 
         recorder.record("ACN0102", ContractNegotiation::transitionOffering)
@@ -74,7 +91,9 @@ public class DataAssembly {
 
         recorder.record("ACN0104", ContractNegotiation::transitionAgreeing)
                 .record("ACN0104", ContractNegotiation::transitionFinalizing);
+    }
 
+    private static void record02NegotiationSequences(StepRecorder<ContractNegotiation> recorder) {
         recorder.record("ACN0201", ContractNegotiation::transitionTerminating);
 
         recorder.record("ACN0202", ContractNegotiation::transitionRequested);
@@ -92,17 +111,34 @@ public class DataAssembly {
             }
         });
 
-        // Verify contract request, provider agreement, consumer verified, provider finalized
         recorder.record("ACN0207", ContractNegotiation::transitionAgreeing)
                 .record("ACN0207", ContractNegotiation::transitionTerminating);
+    }
 
-        return recorder.repeat();
+    private static void record03NegotiationSequences(StepRecorder<ContractNegotiation> recorder) {
+        recorder.record("ACN0301", ContractNegotiation::transitionAgreeing)
+                .record("ACN0301", ContractNegotiation::transitionFinalizing);
+
+        recorder.record("ACN0302", ContractNegotiation::transitionOffering);
+        recorder.record("ACN0303", ContractNegotiation::transitionOffering)
+                .record("ACN0303", ContractNegotiation::transitionAccepting);
+
+        recorder.record("ACN0304", ContractNegotiation::transitionOffering);
     }
 
     public static List<Trigger<ContractNegotiation>> createNegotiationTriggers() {
         return List.of(
                 createTrigger(ContractNegotiationOffered.class, "ACN0205", ContractNegotiation::transitionTerminating),
-                createTrigger(ContractNegotiationAccepted.class, "ACN0206", ContractNegotiation::transitionTerminating)
+                createTrigger(ContractNegotiationAccepted.class, "ACN0206", ContractNegotiation::transitionTerminating),
+                createTrigger(ContractNegotiationOffered.class, "C0101", contractNegotiation -> {
+                    contractNegotiation.transitionAccepting();
+                    contractNegotiation.setPending(false);
+                }),
+                createTrigger(ContractNegotiationAgreed.class, "C0101", contractNegotiation -> {
+                    contractNegotiation.transitionVerifying();
+                    contractNegotiation.setPending(false);
+                })
+
         );
     }
 

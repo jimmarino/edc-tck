@@ -14,3 +14,4 @@
 org.eclipse.edc.tck.dsp.guard.TckGuardExtension
 org.eclipse.edc.tck.dsp.setup.TckSetupExtension
 org.eclipse.edc.tck.dsp.identity.TckIdentityExtension
+org.eclipse.edc.tck.dsp.controller.TckControllerExtension
